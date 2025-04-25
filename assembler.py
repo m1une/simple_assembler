@@ -99,6 +99,10 @@ def assemble(data):
             "01" + to_binary(ra, 3) + to_binary(rb, 3) + to_binary(d, 8, True),
         "LI": lambda rb, d:
             "10" + "000" + to_binary(rb, 3) + to_binary(d, 8, signed=True),
+        "ADDI": lambda rb, d:
+            "10" + "001" + to_binary(rb, 3) + to_binary(d, 8, signed=True),
+        "CMPI": lambda rb, d:
+            "10" + "010" + to_binary(rb, 3) + to_binary(d, 8, signed=True),
         "B": lambda d:
             "10" + "100" + "000" + to_binary(d, 8, signed=True),
         "BE": lambda d:
