@@ -1,0 +1,11 @@
+LI 7,0
+LI 0,1
+ADDI 0,2
+ST 0,1(7)
+SUBI 1,1
+ST 1,2(7)
+CMPI 0,3
+BE 1
+HLT
+OUT 0
+HLT

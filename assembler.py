@@ -101,8 +101,10 @@ def assemble(data):
             "10" + "000" + to_binary(rb, 3) + to_binary(d, 8, signed=True),
         "ADDI": lambda rb, d:
             "10" + "001" + to_binary(rb, 3) + to_binary(d, 8, signed=True),
-        "CMPI": lambda rb, d:
+        "SUBI": lambda rb, d:
             "10" + "010" + to_binary(rb, 3) + to_binary(d, 8, signed=True),
+        "CMPI": lambda rb, d:
+            "10" + "011" + to_binary(rb, 3) + to_binary(d, 8, signed=True),
         "B": lambda d:
             "10" + "100" + "000" + to_binary(d, 8, signed=True),
         "BE": lambda d:
@@ -216,7 +218,7 @@ def main():
     parser.add_argument("-d", "--depth", help="ワード数 (デフォルト: 4096)", type=int, nargs="?", default=4096)
     parser.add_argument("-ar", "--address_radix", help="アドレスの基数 (デフォルト: 10)", type=int, nargs="?", default=10, choices=[2, 10, 16])
     parser.add_argument("-dr", "--data_radix", help="データの基数 (デフォルト: 10)", type=int, nargs="?", default=10, choices=[2, 10, 16])
-    parser.add_argument("-f", "--fill", help="空きメモリに埋める数 (デフォルト: 0)", type=int, nargs="?", default=0)
+    parser.add_argument("-f", "--fill", help="空きメモリに埋める数 (デフォルト: 0)", type=int, nargs="?", default=-24576)
     args = parser.parse_args()
 
     data = read_data(args.input)
