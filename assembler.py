@@ -79,6 +79,8 @@ def assemble(data):
             "11" + to_binary(rs, 3) + to_binary(rd, 3) + "0101" + "0000",
         "MOV": lambda rd, rs:
             "11" + to_binary(rs, 3) + to_binary(rd, 3) + "0110" + "0000",
+        "TRUNC" : lambda rd, d:
+            "11" + "000" + to_binary(rd, 3) + "0111" + to_binary(d, 4),
         "SLL": lambda rd, d:        
             "11" + "000" + to_binary(rd, 3) + "1000" + to_binary(d, 4),
         "SLR": lambda rd, d:        

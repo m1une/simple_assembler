@@ -1,0 +1,4 @@
+LI 0 -1
+TRUNC 0 8
+OUT 0
+HLT
