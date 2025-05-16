@@ -32,22 +32,20 @@ int main() {
     r5 <<= 10;  // r5 = 1024
     r6 = 1;
     r6 <<= 11;  // r6 = 2048
-    r7 = 1;
-    r7 <<= 8;  // r7 = 256
-
+    
     // sorted判定
     r4 = r5;
     r0 = dram[r4];
     r4 += 1;
     do {
-        r1 = dram[r4]; // line 10
+        r1 = dram[r4]; // line 8
         r4 += 1;
-        if (r1 - r0 < 0) break; // go to line 19
+        if (r1 - r0 < 0) break; // go to line 17
         r0 = dram[r4];
         r4 += 1;
         if (r0 - r1 < 0) break;
     } while (1);
-    if (!(r4 - r6 <= 0)) { // sorted // line 19
+    if (!(r4 - r6 <= 0)) { // sorted // line 17
         // debug print, not needed for actual assembly code
         for (short i = 0; i < 4096; i++) {
             short val = dram[i];
@@ -57,20 +55,20 @@ int main() {
     }
     
     // r-sorted判定
-    r4 = r5; // line 22
+    r4 = r5; // line 20
     r0 = dram[r4];
     r4 += 1;
     do {
-        r1 = dram[r4]; // line 25
+        r1 = dram[r4]; // line 23
         r4 += 1;
-        if (r0 - r1 < 0) break; // go to line 34
+        if (r0 - r1 < 0) break; // go to line 32
         r0 = dram[r4];
         r4 += 1;
         if (r1 - r0 < 0) break;
     } while (1);
-    if (!(r4 - r6 <= 0)) {  // r-sorted // line 34
+    if (!(r4 - r6 <= 0)) {  // r-sorted // line 32
         do {
-            r6 -= 1; // line 36
+            r6 -= 1; // line 34
             r0 = dram[r5];
             r1 = dram[r6];
             dram[r6] = r0;
@@ -84,8 +82,10 @@ int main() {
         }
         return 0;
     }
-
-
+    
+    r7 = 1;
+    r7 <<= 8;  // r7 = 256
+    
     // ----------- 下位8bit ----------- //
     // 出現数カウント
     r4 = r5; // line 45
@@ -105,7 +105,7 @@ int main() {
     } while (r4 - r6 < 0);
 
     // カウントの累積和
-    r3 = 0;
+    r3 = 0; // line 56
     r4 = 1;
     r0 = dram[r3];
     dram[r3] = r6;
