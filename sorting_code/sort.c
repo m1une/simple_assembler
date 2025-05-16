@@ -8,7 +8,7 @@ int main() {
         dram[i] = 0;
     }
     for (short i = 1024; i < 2048; i++) {
-        dram[i] = rand() % 65536;
+        dram[i] = -i;
     }
     for (short i = 2048; i < 4096; i++) {
         dram[i] = 0;
@@ -42,53 +42,53 @@ int main() {
     do {
         r1 = dram[r4]; // line 10
         r4 += 1;
-        if (r1 - r0 < 0) break; // go to line 21
-        if (r4 == r6) { // sorted
-            // debug print, not needed for actual assembly code
-            for (short i = 0; i < 4096; i++) {
-                short val = dram[i];
-                printf("%d : %d\n", i, val);
-            }
-            return 0;
-        }
+        if (r1 - r0 < 0) break; // go to line 19
         r0 = dram[r4];
         r4 += 1;
-        // if (r1 > r0) break;
-    } while (r1 - r0 <= 0);
-
+        if (r0 - r1 < 0) break;
+    } while (1);
+    if (!(r4 - r6 <= 0)) { // sorted // line 19
+        // debug print, not needed for actual assembly code
+        for (short i = 0; i < 4096; i++) {
+            short val = dram[i];
+            printf("%d : %d\n", i, val);
+        }
+        return 0;
+    }
+    
     // r-sorted判定
-    r4 = r5; // line 21
+    r4 = r5; // line 22
     r0 = dram[r4];
     r4 += 1;
     do {
-        r1 = dram[r4]; // line 24
+        r1 = dram[r4]; // line 25
         r4 += 1;
-        if (r0 - r1 < 0) break; // go to line 43
-        if (r4 == r6) {  // r-sorted // go to line 39
-            do {
-                r6 -= 1; // line 30
-                r0 = dram[r5];
-                r1 = dram[r6];
-                dram[r6] = r0;
-                dram[r5] = r1;
-                r5 += 1;
-            } while (r5 != r6);
-            // debug print, not needed for actual assembly code
-            for (short i = 0; i < 4096; i++) {
-                short val = dram[i];
-                printf("%d : %d\n", i, val);
-            }
-            return 0;
+        if (r0 - r1 < 0) break; // go to line 34
+        r0 = dram[r4];
+        r4 += 1;
+        if (r1 - r0 < 0) break;
+    } while (1);
+    if (!(r4 - r6 <= 0)) {  // r-sorted // line 34
+        do {
+            r6 -= 1; // line 36
+            r0 = dram[r5];
+            r1 = dram[r6];
+            dram[r6] = r0;
+            dram[r5] = r1;
+            r5 += 1;
+        } while (r5 != r6);
+        // debug print, not needed for actual assembly code
+        for (short i = 0; i < 4096; i++) {
+            short val = dram[i];
+            printf("%d : %d\n", i, val);
         }
-        r0 = dram[r4]; // line 39
-        r4 += 1;
-        // if (r1 < r0) break;
-    } while (r0 - r1 <= 0);
+        return 0;
+    }
 
 
     // ----------- 下位8bit ----------- //
     // 出現数カウント
-    r4 = r5; // line 43
+    r4 = r5; // line 45
     do {
         r0 = dram[r4];
         r4 += 1;
