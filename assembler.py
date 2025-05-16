@@ -93,6 +93,8 @@ def assemble(data):
             "11" + "000" + to_binary(rd, 3) + "1100" + "0000",
         "OUT": lambda rs:
             "11" + to_binary(rs, 3) + "000" + "1101" + "0000",
+        "WAVOUT": lambda rs:
+            "11" + to_binary(rs, 3) + "000" + "1110" + "0000",
         "HLT": lambda:
             "11" + "000" + "000" + "1111" + "0000",
         "LD": lambda ra, d, rb:

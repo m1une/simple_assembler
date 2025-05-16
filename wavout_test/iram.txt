@@ -1,0 +1,3 @@
+LD 1, 0(0)
+WAVOUT 1
+HLT
