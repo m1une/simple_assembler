@@ -8,7 +8,7 @@ int main() {
         dram[i] = 0;
     }
     for (short i = 1024; i < 2048; i++) {
-        dram[i] = -i;
+        dram[i] = rand() % 65536;
     }
     for (short i = 2048; i < 4096; i++) {
         dram[i] = 0;
@@ -32,8 +32,8 @@ int main() {
     r5 <<= 10;  // r5 = 1024
     r6 = 1;
     r6 <<= 11;  // r6 = 2048
-    r7 = r5;
-    r7 += r6;  // r7 = 3072
+    r7 = 1;
+    r7 <<= 8;  // r7 = 256
 
     // sorted判定
     r4 = r5;
@@ -90,7 +90,7 @@ int main() {
     // 出現数カウント
     r4 = r5; // line 45
     do {
-        r0 = dram[r4];
+        r0 = dram[r4]; // line 46
         r4 += 1;
         r2 = dram[r4];
         r0 &= 0x00FF;   // TRUNC r0 8
@@ -102,7 +102,7 @@ int main() {
         dram[r0] = r1;
         dram[r2] = r3;
         r4 += 1;
-    } while (r4 != r6);
+    } while (r4 - r6 < 0);
 
     // カウントの累積和
     r3 = 0;
@@ -113,21 +113,22 @@ int main() {
     r0 += r6;
     dram[r4] = r0;
     r1 += r0;
+    r3 += 2;
     do {
-        r3 += 2;
-        r0 = dram[r3];
+        r0 = dram[r3]; // line 65
         r4 += 2;
         dram[r3] = r1;
         r0 += r1;
         r1 = dram[r4];
         r1 += r0;
         dram[r4] = r0;
-    } while (r4 != 255);
+        r3 += 2;
+    } while (r3 - r7 < 0);
 
     // 値の移動
     r4 = r5;
     do {
-        r0 = dram[r4];
+        r0 = dram[r4]; // line 75
         r4 += 1;
         r1 = r0;
         r0 &= 0x00FF;   // TRUNC r0 8
@@ -135,17 +136,25 @@ int main() {
         dram[r2] = r1;
         r2 += 1;
         dram[r0] = r2;
-    } while (r4 != r6);
+    } while (r4 - r6 < 0);
 
     // ----------- 上位8bit ----------- //
-    // カウントを0に初期化
+    // debug print, not needed for actual assembly code
+    for (short i = 0; i < 4096; i++) {
+        short val = dram[i];
+        printf("%d : %d\n", i, val);
+    }
+    return 0;    // カウントを0に初期化
+    r0 = 0; // line 86
     r4 = 0;
-    dram[r4] = 0;
     do {
+        dram[r4] = r0; // line 88
         r4 += 1;
-        dram[r4] = 0;
-    } while (r4 != 255);
+    } while (r4 - r7 < 0);
 
+
+    r7 = r5;
+    r7 += r6; // r7 = 3072
     // 出現数カウント
     r4 = r6;
     do {
