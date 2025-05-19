@@ -38,7 +38,7 @@ int main() {
     r0 = dram[r4];
     r4 += 1;
     do {
-        // ; BEGINLOOPSORTED
+        // ; BEGINLOOP_SORTED
         r1 = dram[r4];
         r4 += 1;
         if (r1 - r0 < 0) break;
@@ -46,7 +46,7 @@ int main() {
         r4 += 1;
         if (r0 - r1 < 0) break;
     } while (1);
-    // ; ENDLOOPSORTED
+    // ; ENDLOOP_SORTED
     if (!(r4 - r6 <= 0)) { // sorted 
         // debug print, not needed for actual assembly code
         for (short i = 0; i < 4096; i++) {
@@ -55,14 +55,14 @@ int main() {
         }
         return 0;
     }
-    // ; ENDIFSORTED
+    // ; ENDIF_SORTED
     
     // r-sorted判定
     r4 = r5;
     r0 = dram[r4];
     r4 += 1;
     do {
-        // ; BEGINLOOPRSORTED
+        // ; BEGINLOOP_RSORTED
         r1 = dram[r4];
         r4 += 1;
         if (r0 - r1 < 0) break;
@@ -70,16 +70,17 @@ int main() {
         r4 += 1;
         if (r1 - r0 < 0) break;
     } while (1);
-    // ; ENDLOOPRSORTED
+    // ; ENDLOOP_RSORTED
     if (!(r4 - r6 <= 0)) {  // r-sorted // line 32
         do {
+            // ; BEGINLOOP_SWAP_RSORTED
             r6 -= 1; // line 34
             r0 = dram[r5];
             r1 = dram[r6];
             dram[r6] = r0;
             dram[r5] = r1;
             r5 += 1;
-        } while (r5 != r6);
+        } while (r5 < r6);
         // debug print, not needed for actual assembly code
         for (short i = 0; i < 4096; i++) {
             short val = dram[i];
@@ -87,6 +88,7 @@ int main() {
         }
         return 0;
     }
+    // ; ENDIF_RSORTED
     
     r7 = 1;
     r7 <<= 8;
