@@ -31,7 +31,7 @@ def preproc(line):
       引数は英数字以外の文字で分割され、前から順番にargsに入る。
       d(Rb)の形式のものは、d,Rbの順でargsに入る。
     """
-    head, *tail = re.findall(r"[a-zA-Z]+|[-+]?\d+", line)
+    head, *tail = re.findall(r"[a-zA-Z_]+|[-+]?\d+", line)
     cmd = head.upper()
     args = []
     for i in tail:

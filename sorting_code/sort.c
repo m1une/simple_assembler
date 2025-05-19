@@ -39,15 +39,15 @@ int main() {
     r4 += 1;
     do {
         // ; BEGINLOOPSORTED
-        r1 = dram[r4]; // line 8
+        r1 = dram[r4];
         r4 += 1;
-        if (r1 - r0 < 0) break; // go to line 17
+        if (r1 - r0 < 0) break;
         r0 = dram[r4];
         r4 += 1;
         if (r0 - r1 < 0) break;
     } while (1);
     // ; ENDLOOPSORTED
-    if (!(r4 - r6 <= 0)) { // sorted // line 17
+    if (!(r4 - r6 <= 0)) { // sorted 
         // debug print, not needed for actual assembly code
         for (short i = 0; i < 4096; i++) {
             short val = dram[i];
@@ -55,19 +55,22 @@ int main() {
         }
         return 0;
     }
+    // ; ENDIFSORTED
     
     // r-sorted判定
-    r4 = r5; // line 20
+    r4 = r5;
     r0 = dram[r4];
     r4 += 1;
     do {
-        r1 = dram[r4]; // line 23
+        // ; BEGINLOOPRSORTED
+        r1 = dram[r4];
         r4 += 1;
-        if (r0 - r1 < 0) break; // go to line 32
+        if (r0 - r1 < 0) break;
         r0 = dram[r4];
         r4 += 1;
         if (r1 - r0 < 0) break;
     } while (1);
+    // ; ENDLOOPRSORTED
     if (!(r4 - r6 <= 0)) {  // r-sorted // line 32
         do {
             r6 -= 1; // line 34
