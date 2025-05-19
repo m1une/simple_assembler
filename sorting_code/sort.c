@@ -38,6 +38,7 @@ int main() {
     r0 = dram[r4];
     r4 += 1;
     do {
+        // ; BEGINLOOPSORTED
         r1 = dram[r4]; // line 8
         r4 += 1;
         if (r1 - r0 < 0) break; // go to line 17
@@ -45,6 +46,7 @@ int main() {
         r4 += 1;
         if (r0 - r1 < 0) break;
     } while (1);
+    // ; ENDLOOPSORTED
     if (!(r4 - r6 <= 0)) { // sorted // line 17
         // debug print, not needed for actual assembly code
         for (short i = 0; i < 4096; i++) {
@@ -84,17 +86,18 @@ int main() {
     }
     
     r7 = 1;
-    r7 <<= 8;  // r7 = 256
+    r7 <<= 8;
+    r7 -= 1; // r7 = 0x00FF
     
     // ----------- 下位8bit ----------- //
     // 出現数カウント
-    r4 = r5; // line 45
+    r4 = r5; // line 46
     do {
-        r0 = dram[r4]; // line 46
+        r0 = dram[r4]; // line 47
         r4 += 1;
         r2 = dram[r4];
-        r0 &= 0x00FF;   // TRUNC r0 8
-        r2 &= 0x00FF;   // TRUNC r2 8
+        r0 &= r7;
+        r2 &= r7;
         r1 = dram[r0];
         r3 = dram[r2];
         r1 += 1;
@@ -110,46 +113,46 @@ int main() {
     r0 = dram[r3];
     dram[r3] = r6;
     r1 = dram[r4];
-    r0 += r6;
+    r0 += r6; // 2048スタート
     dram[r4] = r0;
     r1 += r0;
-    r3 += 2;
     do {
-        r0 = dram[r3]; // line 65
+        r3 += 2; // line 69
+        r0 = dram[r3];
         r4 += 2;
         dram[r3] = r1;
         r0 += r1;
         r1 = dram[r4];
         r1 += r0;
         dram[r4] = r0;
-        r3 += 2;
-    } while (r3 - r7 < 0);
+    } while (r4 - r7 < 0);
 
     // 値の移動
     r4 = r5;
     do {
-        r0 = dram[r4]; // line 75
-        r4 += 1;
+        r0 = dram[r4]; // line 80
         r1 = r0;
-        r0 &= 0x00FF;   // TRUNC r0 8
+        r0 &= r7;
         r2 = dram[r0];
+        r4 += 1;
         dram[r2] = r1;
         r2 += 1;
         dram[r0] = r2;
     } while (r4 - r6 < 0);
 
-    // ----------- 上位8bit ----------- //
-    // debug print, not needed for actual assembly code
     for (short i = 0; i < 4096; i++) {
         short val = dram[i];
         printf("%d : %d\n", i, val);
     }
-    return 0;    // カウントを0に初期化
+    return 0;
+
+    // ----------- 上位8bit ----------- //
     r0 = 0; // line 86
     r4 = 0;
+    dram[r4] = r0;
     do {
-        dram[r4] = r0; // line 88
         r4 += 1;
+        dram[r4] = r0; // line 88
     } while (r4 - r7 < 0);
 
 

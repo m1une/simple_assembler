@@ -38,7 +38,7 @@ def preproc(line):
         try:
             args.append(int(i))
         except Exception:
-            raise ValueError(i)
+            args.append(i)
     return cmd, args
 
 
@@ -64,6 +64,17 @@ def assemble(data):
       命令を追加するときは inst に関数を追加する
     """
     result = []
+    labels = {}
+    pc = 0
+    def resolve_label(d):
+        if isinstance(d, str):
+            if d not in labels:
+                raise ValueError(f"{d} : ラベルが定義されていません")
+            d = labels[d] - pc - 1
+        if not -128 <= d < 128:
+            raise ValueError(f"{d} : ラベルの値が不正です")
+        return to_binary(d, 8, signed=True)
+    
     inst = { # 引数の数が多すぎるときに例外を発生させるため
         "ADD": lambda rd, rs:
             "11" + to_binary(rs, 3) + to_binary(rd, 3) + "0000" + "0000",
@@ -110,18 +121,38 @@ def assemble(data):
         "CMPI": lambda rb, d:
             "10" + "011" + to_binary(rb, 3) + to_binary(d, 8, signed=True),
         "B": lambda d:
-            "10" + "100" + "000" + to_binary(d, 8, signed=True),
+            "10" + "100" + "000" + resolve_label(d),
         "BE": lambda d:
-            "10" + "111" + "000" + to_binary(d, 8, signed=True),
+            "10" + "111" + "000" + resolve_label(d),
         "BLT": lambda d:
-            "10" + "111" + "001" + to_binary(d, 8, signed=True),
+            "10" + "111" + "001" + resolve_label(d),
         "BLE": lambda d:
-            "10" + "111" + "010" + to_binary(d, 8, signed=True),
+            "10" + "111" + "010" + resolve_label(d),
         "BNE": lambda d:
-            "10" + "111" + "011" + to_binary(d, 8, signed=True)
+            "10" + "111" + "011" + resolve_label(d)
     }
     for i, line in enumerate(data):
-        if not line or line.startswith("//"):
+        if line.startswith(";"):
+            parts = line.split(maxsplit=1)
+            if len(parts) != 2:
+                raise ValueError(str(i+1) + "行目: ラベルの形式が不正です", file=sys.stderr)
+                exit(1)
+            label = parts[1].strip()
+            if not label or " " in label:
+                raise ValueError(str(i+1) + "行目: ラベルの形式が不正です", file=sys.stderr)
+                exit(1)
+            if label in labels:
+                print(str(i+1) + "行目: ラベルが重複しています", file=sys.stderr)
+                exit(1)
+            labels[label] = pc
+        elif not line or line.startswith("//"):
+            continue
+        else:
+            pc += 1
+        
+    pc = 0
+    for i, line in enumerate(data):
+        if not line or line.startswith("//") or line.startswith(";"):
             continue
         cmd, args = "", []
         try:
@@ -143,6 +174,7 @@ def assemble(data):
         except TypeError as e:
             print(str(i + 1) + "行目 : 引数の数が不正です", e, file=sys.stderr)
             exit(1)
+        pc += 1
     return result
 
 def format_result(result, address_radix=10, data_radix=10,
