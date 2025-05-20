@@ -98,7 +98,8 @@ int main() {
     // 出現数カウント
     r4 = r5; // line 46
     do {
-        r0 = dram[r4]; // line 47
+        // ; BEGINLOOP_COUNT_LOW
+        r0 = dram[r4];
         r4 += 1;
         r2 = dram[r4];
         r0 &= r7;
@@ -128,8 +129,8 @@ int main() {
         dram[r3] = r1;
         r0 += r1;
         r1 = dram[r4];
-        r1 += r0;
         dram[r4] = r0;
+        r1 += r0;
     } while (r4 - r7 < 0);
 
     // 値の移動
@@ -145,11 +146,11 @@ int main() {
         dram[r0] = r2;
     } while (r4 - r6 < 0);
 
-    for (short i = 0; i < 4096; i++) {
-        short val = dram[i];
-        printf("%d : %d\n", i, val);
-    }
-    return 0;
+    // for (short i = 0; i < 4096; i++) {
+    //     short val = dram[i];
+    //     printf("%d : %d\n", i, val);
+    // }
+    // return 0;
 
     // ----------- 上位8bit ----------- //
     r0 = 0; // line 86

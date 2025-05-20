@@ -59,6 +59,7 @@ SUBI 7 1
 // 下位8bit
 // 出現数カウント
 MOV 4 5
+; BEGINLOOP_COUNT_LOW
 LD 0 0(4)
 ADDI 4 1
 LD 2 0(4)
@@ -72,7 +73,8 @@ ST 1 0(0)
 ST 3 0(2)
 ADDI 4 1
 CMP 4 6
-BNE -14
+BNE BEGINLOOP_COUNT_LOW
+
 LI 3 0
 LI 4 1
 LD 0 0(3)
@@ -87,8 +89,8 @@ ADDI 4 2
 ST 1 0(3)
 ADD 0 1
 LD 1 0(4)
-ADD 1 0
 ST 0 0(4)
+ADD 1 0
 CMP 4 7
 BLT -10
 MOV 4 5
