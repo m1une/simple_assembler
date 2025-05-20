@@ -5,6 +5,14 @@
 
 short dram[4096];
 
+void halt() {
+    for (short i = 0; i < 4096; i++) {
+        short val = dram[i];
+        printf("%d : %d\n", i, val);
+    }
+    exit(0);
+}
+
 int compare(const void *a, const void *b) {
     return (*(short *)a - *(short *)b);
 }
@@ -20,12 +28,8 @@ int main() {
     for (short i = 2048; i < 4096; i++) {
         dram[i] = 0;
     }
-    qsort(dram + 1024, 1024, sizeof(short), (int (*)(const void *, const void *))compare);
-    for (short i = 0; i < 4096; i++) {
-        short val = dram[i];
-        printf("%d : %d\n", i, val);
-    }
-    return 0;
+    // qsort(dram + 1024, 1024, sizeof(short), (int (*)(const void *, const void *))compare);
+    // halt();
 
     // dram[1024:2047] : array to sort
     // dram[0:255] : counter array
@@ -61,12 +65,7 @@ int main() {
     } while (1);
     // ; ENDLOOP_SORTED
     if (!(r4 - r6 <= 0)) { // sorted 
-        // debug print, not needed for actual assembly code
-        for (short i = 0; i < 4096; i++) {
-            short val = dram[i];
-            printf("%d : %d\n", i, val);
-        }
-        return 0;
+       halt();
     }
     // ; ENDIF_SORTED
     
@@ -94,12 +93,7 @@ int main() {
             dram[r5] = r1;
             r5 += 1;
         } while (r5 < r6);
-        // debug print, not needed for actual assembly code
-        for (short i = 0; i < 4096; i++) {
-            short val = dram[i];
-            printf("%d : %d\n", i, val);
-        }
-        return 0;
+        halt();
     }
     // ; ENDIF_RSORTED
     
@@ -114,16 +108,10 @@ int main() {
         // ; BEGINLOOP_COUNT_LOW
         r0 = dram[r4];
         r4 += 1;
-        r2 = dram[r4];
         r0 &= r7;
-        r2 &= r7;
         r1 = dram[r0];
-        r3 = dram[r2];
         r1 += 1;
-        r3 += 1;
         dram[r0] = r1;
-        dram[r2] = r3;
-        r4 += 1;
     } while (r4 - r6 < 0);
 
     // カウントの累積和
@@ -161,12 +149,6 @@ int main() {
         dram[r0] = r2;
     } while (r4 - r6 < 0);
 
-    // for (short i = 0; i < 4096; i++) {
-    //     short val = dram[i];
-    //     printf("%d : %d\n", i, val);
-    // }
-    // return 0;
-
     // ----------- 上位8bit ----------- //
 
     // r4 = 2048, r5 = 1024, r6 = 2048, r7 = 255
@@ -188,18 +170,11 @@ int main() {
         // ; BEGINLOOP_COUNT_HIGH
         r0 = dram[r4];
         r4 += 1;
-        r2 = dram[r4];
         r0 >>= 8;
         r0 &= 0x00FF;   // not needed for actual assembly code
-        r2 >>= 8;
-        r2 &= 0x00FF;   // not needed for actual assembly code
         r1 = dram[r0];
-        r3 = dram[r2];
         r1 += 1;
-        r3 += 1;
         dram[r0] = r1;
-        dram[r2] = r3;
-        r4 += 1;
     } while (r4 - r6 < 0); // until 3072
 
     // カウントの累積和
@@ -263,10 +238,6 @@ int main() {
 
 
 
-    // debug print, not needed for actual assembly code
-    for (short i = 0; i < 4096; i++) {
-        short val = dram[i];
-        printf("%d : %d\n", i, val);
-    }
+    halt();
     return 0;
 }
