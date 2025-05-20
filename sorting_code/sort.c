@@ -123,7 +123,8 @@ int main() {
     dram[r4] = r0;
     r1 += r0;
     do {
-        r3 += 2; // line 69
+        // ; BEGINLOOP_CUMSUM_LOW
+        r3 += 2;
         r0 = dram[r3];
         r4 += 2;
         dram[r3] = r1;
@@ -136,7 +137,8 @@ int main() {
     // 値の移動
     r4 = r5;
     do {
-        r0 = dram[r4]; // line 80
+        // ; BEGINLOOP_ASSEMBLE_LOW
+        r0 = dram[r4];
         r1 = r0;
         r0 &= r7;
         r2 = dram[r0];
