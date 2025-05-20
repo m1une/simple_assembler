@@ -1,6 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "randomdata.c"
+
 short dram[4096];
+
+int compare(const void *a, const void *b) {
+    return (*(short *)a - *(short *)b);
+}
 
 int main() {
     // initializing, not needed for actual assembly code
@@ -8,11 +15,17 @@ int main() {
         dram[i] = 0;
     }
     for (short i = 1024; i < 2048; i++) {
-        dram[i] = rand() % 65536;
+        dram[i] = data[i - 1024];
     }
     for (short i = 2048; i < 4096; i++) {
         dram[i] = 0;
     }
+    qsort(dram + 1024, 1024, sizeof(short), (int (*)(const void *, const void *))compare);
+    for (short i = 0; i < 4096; i++) {
+        short val = dram[i];
+        printf("%d : %d\n", i, val);
+    }
+    return 0;
 
     // dram[1024:2047] : array to sort
     // dram[0:255] : counter array
@@ -96,7 +109,7 @@ int main() {
     
     // ----------- 下位8bit ----------- //
     // 出現数カウント
-    r4 = r5; // line 46
+    r4 = r5;
     do {
         // ; BEGINLOOP_COUNT_LOW
         r0 = dram[r4];
@@ -155,20 +168,24 @@ int main() {
     // return 0;
 
     // ----------- 上位8bit ----------- //
+
+    // r4 = 2048, r5 = 1024, r6 = 2048, r7 = 255
+
     r0 = 0; // line 86
-    r4 = 0;
-    dram[r4] = r0;
+    r1 = 0;
+    dram[r1] = r0;
     do {
-        r4 += 1;
-        dram[r4] = r0; // line 88
-    } while (r4 - r7 < 0);
+        ; // BEGINLOOP_RESET_COUNT
+        r1 += 1;
+        dram[r1] = r0; // line 88
+    } while (r1 - r7 < 0);
 
 
-    r7 = r5;
-    r7 += r6; // r7 = 3072
+    r6 += r5; // r6 = 3072
     // 出現数カウント
-    r4 = r6;
+    // r4 = 2048
     do {
+        // ; BEGINLOOP_COUNT_HIGH
         r0 = dram[r4];
         r4 += 1;
         r2 = dram[r4];
@@ -183,49 +200,56 @@ int main() {
         dram[r0] = r1;
         dram[r2] = r3;
         r4 += 1;
-    } while (r4 != r7);
+    } while (r4 - r6 < 0); // until 3072
 
     // カウントの累積和
-    r3 = 128;
-    r4 = 129;
+    r3 = 1;
+    r3 <<= 7; // r3 = 128
+    r4 = r3;
+    r4 += 1;
     r0 = dram[r3];
-    dram[r3] = r5;
+    dram[r3] = r5; // 1024スタート
     r1 = dram[r4];
     r0 += r5;
     dram[r4] = r0;
     r1 += r0;
     do {
+        // ; BEGINLOOP_CUMSUM_HIGH_NEG
         r3 += 2;
         r0 = dram[r3];
         r4 += 2;
         dram[r3] = r1;
         r0 += r1;
         r1 = dram[r4];
-        r1 += r0;
         dram[r4] = r0;
-    } while (r4 != 255);
+        r1 += r0;
+    } while (r4 - r7 < 0); // until 255
+    r7 >>= 1;
     r3 = 0;
     r0 = dram[r3];
     r4 = 1;
     dram[r3] = r1;
     r0 += r1;
     r1 = dram[r4];
-    r1 += r0;
     dram[r4] = r0;
+    r1 += r0;
     do {
+        // ; BEGINLOOP_CUMSUM_HIGH_POS
         r3 += 2;
         r0 = dram[r3];
         r4 += 2;
         dram[r3] = r1;
         r0 += r1;
         r1 = dram[r4];
-        r1 += r0;
         dram[r4] = r0;
-    } while (r4 != 127);
+        r1 += r0;
+    } while (r4 - r7 < 0); // until 127
 
     // 値の移動
-    r4 = r6;
+    r5 <<= 1;
+    r4 = r5; // from 2048
     do {
+        // ; BEGINLOOP_ASSEMBLE_HIGH
         r0 = dram[r4];
         r4 += 1;
         r1 = r0;
@@ -235,7 +259,7 @@ int main() {
         dram[r2] = r1;
         r2 += 1;
         dram[r0] = r2;
-    } while (r4 != r7);
+    } while (r4 - r6 < 0); // until 3072
 
 
 
