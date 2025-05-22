@@ -75,6 +75,20 @@ def assemble(data):
             raise ValueError(f"{d} : ラベルの値が不正です")
         return to_binary(d, 8, signed=True)
     
+    def resolve_label4(d):
+        if isinstance(d, str):
+            if d not in labels:
+                raise ValueError(f"{d} : ラベルが定義されていません")
+            if (labels[d] == pc):
+                raise ValueError(f"{d} : ラベルの定義が不正です")
+            if (pc < labels[d]):
+                d = labels[d] - pc - 1
+            else:
+                d = labels[d] - pc
+        if not -8 <= d < 8:
+            raise ValueError(f"{d} : ラベルの値が不正です")
+        return to_binary(d, 4, signed=True)
+    
     inst = { # 引数の数が多すぎるときに例外を発生させるため
         "ADD": lambda rd, rs:
             "11" + to_binary(rs, 3) + to_binary(rd, 3) + "0000" + "0000",
@@ -90,7 +104,9 @@ def assemble(data):
             "11" + to_binary(rs, 3) + to_binary(rd, 3) + "0101" + "0000",
         "MOV": lambda rd, rs:
             "11" + to_binary(rs, 3) + to_binary(rd, 3) + "0110" + "0000",
-        "SLL": lambda rd, d:        
+        "CBLT": lambda rd, rs, d:
+            "11" + to_binary(rs, 3) + to_binary(rd, 3) + "0111" + resolve_label4(d),
+        "SLL": lambda rd, d:
             "11" + "000" + to_binary(rd, 3) + "1000" + to_binary(d, 4),
         "SLR": lambda rd, d:        
             "11" + "000" + to_binary(rd, 3) + "1001" + to_binary(d, 4),
