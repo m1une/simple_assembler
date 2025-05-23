@@ -169,28 +169,32 @@ int main() {
     r4 = r3;
     do {
         // ; BEGINLOOP_ASSEMBLE_LOW
-        r0 = dram[r4];
-        r1 = r0;
-        r0 &= r7;
-        r2 = dram[r0];
-        r4 += 1;
-        dram[r2] = r1;
-        r2 += 1;
-        dram[r0] = r2;
+        for (short i = 0; i < 8; i++) {
+            r0 = dram[r4];
+            r1 = r0;
+            r0 &= r7;
+            r2 = dram[r0];
+            r4 += 1;
+            dram[r2] = r1;
+            r2 += 1;
+            dram[r0] = r2;
+        }
     } while (r4 - r6 < 0); // until 2048
     r6 += r3;
     do {
         // ; BEGINLOOP_ASSEMBLE_HIGH
-        r0 = dram[r4];
-        r1 = r0;
-        r0 >>= 8;
-        r0 &= 0x00FF;   // not needed for actual assembly code
-        r0 ^= r5;
-        r2 = dram[r0];
-        r4 += 1;
-        dram[r2] = r1;
-        r2 += 1;
-        dram[r0] = r2;
+        for (short i = 0; i < 8; i++) {
+            r0 = dram[r4];
+            r1 = r0;
+            r0 >>= 8;
+            r0 &= 0x00FF;   // not needed for actual assembly code
+            r0 ^= r5;
+            r2 = dram[r0];
+            r4 += 1;
+            dram[r2] = r1;
+            r2 += 1;
+            dram[r0] = r2;
+        }
     } while (r4 - r6 < 0); // until 3072
 
     halt();

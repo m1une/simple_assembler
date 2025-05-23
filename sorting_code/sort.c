@@ -210,14 +210,16 @@ int main() {
     r1 += r0;
     do {
         // ; BEGINLOOP_CUMSUM_HIGH_POS
-        r3 += 2;
-        r0 = dram[r3];
-        r4 += 2;
-        dram[r3] = r1;
-        r0 += r1;
-        r1 = dram[r4];
-        dram[r4] = r0;
-        r1 += r0;
+        for (short i = 0; i < 8; i++) {
+            r3 += 2;
+            r0 = dram[r3];
+            r4 += 2;
+            dram[r3] = r1;
+            r0 += r1;
+            r1 = dram[r4];
+            dram[r4] = r0;
+            r1 += r0;
+        }
     } while (r4 - r7 < 0); // until 127
 
     // 値の移動
