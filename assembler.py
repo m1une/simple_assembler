@@ -261,6 +261,33 @@ def write_result(result, output = None, **kwargs):
     else:
         print(s)
 
+def expand_loops(data):
+    """
+    .repeat N ～ .end ブロックを N 回展開する。
+    """
+    output = []
+    i = 0
+    while i < len(data):
+        line = data[i].strip()
+        if line.startswith(".repeat"):
+            parts = line.split()
+            if len(parts) != 2 or not parts[1].isdigit():
+                raise ValueError(f"{i+1}行目: .repeat 構文が不正です")
+            count = int(parts[1])
+            loop_body = []
+            i += 1
+            while i < len(data) and not data[i].strip().startswith(".end"):
+                loop_body.append(data[i])
+                i += 1
+            if i >= len(data):
+                raise ValueError(f"{i+1}行目: .end が見つかりません")
+            for _ in range(count):
+                output.extend(loop_body)
+        else:
+            output.append(line)
+        i += 1
+    return output
+
 def main():
     parser = argparse.ArgumentParser(description="SIMPLEアセンブラ")
     parser.add_argument("input", help="入力ファイル (デフォルト: 標準入力)", nargs="?")
@@ -271,7 +298,7 @@ def main():
     parser.add_argument("-f", "--fill", help="空きメモリに埋める数 (デフォルト: 0)", type=int, nargs="?", default=-24576)
     args = parser.parse_args()
 
-    data = read_data(args.input)
+    data = expand_loops(read_data(args.input))
     result = assemble(data)
     write_result(result, **vars(args)) # 全部渡す
 

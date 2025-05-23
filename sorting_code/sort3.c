@@ -101,18 +101,28 @@ int main() {
     r7 <<= 8;
     r7 -= 1; // r7 = 0x00FF
     
-    // ----------- 下位8bit ----------- //
     // 出現数カウント
     r4 = r5;
+    r5 = 3;
+    r5 <<= 7; // r5 = 16'b 0000 0001 1000 0000
     do {
-        // ; BEGINLOOP_COUNT_LOW
-        r0 = dram[r4];
-        r4 += 1;
-        r0 &= r7;
-        r1 = dram[r0];
-        r1 += 1;
-        dram[r0] = r1;
-    } while (r4 - r6 < 0);
+        // ; BEGINLOOP_COUNT
+        for (int i = 0; i < 8; i++) {
+            r0 = dram[r4];
+            r4 += 1;
+            r2 = r0;
+            r2 >>= 8;
+            r2 &= 0x00FF;   // not needed for actual assembly code
+            r2 ^= r5;
+            r0 &= r7;
+            r1 = dram[r0];
+            r3 = dram[r2];
+            r1 += 1;
+            r3 += 1;
+            dram[r0] = r1;
+            dram[r2] = r3;
+        }
+    } while (r4 - r6 < 0); // until 2048
 
     // カウントの累積和
     r3 = 0; // line 56
@@ -123,8 +133,7 @@ int main() {
     r0 += r6; // 2048スタート
     dram[r4] = r0;
     r1 += r0;
-    do {
-        // ; BEGINLOOP_CUMSUM_LOW
+    for (short i = 0; i < 127; i++) {
         r3 += 2;
         r0 = dram[r3];
         r4 += 2;
@@ -133,10 +142,31 @@ int main() {
         r1 = dram[r4];
         dram[r4] = r0;
         r1 += r0;
-    } while (r4 - r7 < 0);
+    };
+    r6 >>= 1; // r6 = 1024
+    r3 += 2;
+    r4 += 2;
+    r0 = dram[r3];
+    dram[r3] = r6;
+    r1 = dram[r4];
+    r0 += r6; // 1024スタート
+    dram[r4] = r0;
+    r1 += r0;
+    for (short i = 0; i < 127; i++) {
+        r3 += 2;
+        r0 = dram[r3];
+        r4 += 2;
+        dram[r3] = r1;
+        r0 += r1;
+        r1 = dram[r4];
+        dram[r4] = r0;
+        r1 += r0;
+    }
 
+    r3 = r6;
+    r6 <<= 1; // r6 = 2048
     // 値の移動
-    r4 = r5;
+    r4 = r3;
     do {
         // ; BEGINLOOP_ASSEMBLE_LOW
         r0 = dram[r4];
@@ -147,98 +177,21 @@ int main() {
         dram[r2] = r1;
         r2 += 1;
         dram[r0] = r2;
-    } while (r4 - r6 < 0);
-
-    // ----------- 上位8bit ----------- //
-
-    // r4 = 2048, r5 = 1024, r6 = 2048, r7 = 255
-
-    r0 = 0; // line 86
-    r1 = 0;
-    dram[r1] = r0;
-    do {
-        ; // BEGINLOOP_RESET_COUNT
-        r1 += 1;
-        dram[r1] = r0; // line 88
-    } while (r1 - r7 < 0);
-
-
-    r6 += r5; // r6 = 3072
-    // 出現数カウント
-    // r4 = 2048
-    do {
-        // ; BEGINLOOP_COUNT_HIGH
-        r0 = dram[r4];
-        r4 += 1;
-        r0 >>= 8;
-        r0 &= 0x00FF;   // not needed for actual assembly code
-        r1 = dram[r0];
-        r1 += 1;
-        dram[r0] = r1;
-    } while (r4 - r6 < 0); // until 3072
-
-    // カウントの累積和
-    r3 = 1;
-    r3 <<= 7; // r3 = 128
-    r4 = r3;
-    r4 += 1;
-    r0 = dram[r3];
-    dram[r3] = r5; // 1024スタート
-    r1 = dram[r4];
-    r0 += r5;
-    dram[r4] = r0;
-    r1 += r0;
-    do {
-        // ; BEGINLOOP_CUMSUM_HIGH_NEG
-        r3 += 2;
-        r0 = dram[r3];
-        r4 += 2;
-        dram[r3] = r1;
-        r0 += r1;
-        r1 = dram[r4];
-        dram[r4] = r0;
-        r1 += r0;
-    } while (r4 - r7 < 0); // until 255
-    r7 >>= 1;
-    r3 = 0;
-    r0 = dram[r3];
-    r4 = 1;
-    dram[r3] = r1;
-    r0 += r1;
-    r1 = dram[r4];
-    dram[r4] = r0;
-    r1 += r0;
-    do {
-        // ; BEGINLOOP_CUMSUM_HIGH_POS
-        r3 += 2;
-        r0 = dram[r3];
-        r4 += 2;
-        dram[r3] = r1;
-        r0 += r1;
-        r1 = dram[r4];
-        dram[r4] = r0;
-        r1 += r0;
-    } while (r4 - r7 < 0); // until 127
-
-    // 値の移動
-    r5 <<= 1;
-    r4 = r5; // from 2048
+    } while (r4 - r6 < 0); // until 2048
+    r6 += r3;
     do {
         // ; BEGINLOOP_ASSEMBLE_HIGH
-        for (short i = 0; i < 8; i++) {
-            r0 = dram[r4];
-            r4 += 1;
-            r1 = r0;
-            r0 >>= 8;
-            r0 &= 0x00FF;   // not needed for actual assembly code
-            r2 = dram[r0];
-            dram[r2] = r1;
-            r2 += 1;
-            dram[r0] = r2;
-        }
+        r0 = dram[r4];
+        r1 = r0;
+        r0 >>= 8;
+        r0 &= 0x00FF;   // not needed for actual assembly code
+        r0 ^= r5;
+        r2 = dram[r0];
+        r4 += 1;
+        dram[r2] = r1;
+        r2 += 1;
+        dram[r0] = r2;
     } while (r4 - r6 < 0); // until 3072
-
-
 
     halt();
     return 0;
